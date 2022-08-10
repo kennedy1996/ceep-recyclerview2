@@ -78,7 +78,7 @@ public class ListaNotasActivity extends AppCompatActivity {
             }
         }
 
-        if(ehResulstadoAlteraNota(resultCode, data)){
+        if(ehResultadoAlteraNota(requestCode, data)){
             if(resultadoOK(resultCode)){
                 Nota notaRecebida = (Nota) data.getSerializableExtra(CHAVE_NOTA);
                 int posicaoRecebida = data.getIntExtra(CHAVE_POSICAO, POSICAO_INVALIDA);
@@ -100,8 +100,8 @@ public class ListaNotasActivity extends AppCompatActivity {
         return posicaoRecebida >POSICAO_INVALIDA;
     }
 
-    private boolean  ehResulstadoAlteraNota(int resultCode, Intent data) {
-        return ehCodigoResultadoAlteraNota(resultCode) && resultadoOK(resultCode)
+    private boolean ehResultadoAlteraNota(int requestCode, Intent data) {
+        return ehCodigoResultadoAlteraNota(requestCode)
                 && temNota(data);
     }
 

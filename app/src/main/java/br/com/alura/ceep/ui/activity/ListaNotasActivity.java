@@ -4,9 +4,9 @@ import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.CHAVE_NOTA;
 import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.CHAVE_POSICAO;
 import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.CODIGO_REQUISICAO_ALTERA_NOTA;
 import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.CODIGO_REQUISICAO_INSERE_NOTA;
-import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.CODIGO_RESULTADO_NOTA_CRIADA;
 import static br.com.alura.ceep.ui.activity.NotaActivityConstantes.POSICAO_INVALIDA;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
@@ -67,18 +67,22 @@ public class ListaNotasActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if(ehResultadoInsereNota(requestCode, resultCode, data)){
-            Nota notaRecebida = (Nota) data.getSerializableExtra(CHAVE_NOTA);
-            adiciona(notaRecebida);
+        if(ehResultadoInsereNota(requestCode, data)){
+            if(resultadoOK(resultCode)){
+                Nota notaRecebida = (Nota) data.getSerializableExtra(CHAVE_NOTA);
+                adiciona(notaRecebida);
+            }
         }
 
         if(ehResulstadoAlteraNota(resultCode, data)){
-            Nota notaRecebida = (Nota) data.getSerializableExtra(CHAVE_NOTA);
-            int posicaoRecebida = data.getIntExtra(CHAVE_POSICAO, POSICAO_INVALIDA);
-            if(ehPosicaoValida(posicaoRecebida)){
-                alteraNota(notaRecebida, posicaoRecebida);
-            }else {
-                Toast.makeText(this, "Houve um problema  na alteração na nota", Toast.LENGTH_SHORT).show();
+            if(resultadoOK(resultCode)){
+                Nota notaRecebida = (Nota) data.getSerializableExtra(CHAVE_NOTA);
+                int posicaoRecebida = data.getIntExtra(CHAVE_POSICAO, POSICAO_INVALIDA);
+                if(ehPosicaoValida(posicaoRecebida)){
+                    alteraNota(notaRecebida, posicaoRecebida);
+                }else {
+                    Toast.makeText(this, "Houve um problema  na alteração na nota", Toast.LENGTH_SHORT).show();
+                }
             }
         }
     }
@@ -92,8 +96,8 @@ public class ListaNotasActivity extends AppCompatActivity {
         return posicaoRecebida >POSICAO_INVALIDA;
     }
 
-    private boolean ehResulstadoAlteraNota(int resultCode, Intent data) {
-        return ehCodigoResultadoAlteraNota(resultCode) && ehCodigoResultadoNotaCriada(resultCode)
+    private boolean  ehResulstadoAlteraNota(int resultCode, Intent data) {
+        return ehCodigoResultadoAlteraNota(resultCode) && resultadoOK(resultCode)
                 && temNota(data);
     }
 
@@ -102,9 +106,8 @@ public class ListaNotasActivity extends AppCompatActivity {
         adapter.adiciona(nota);
     }
 
-    private boolean ehResultadoInsereNota(int requestCode, int resultCode, Intent data) {
+    private boolean ehResultadoInsereNota(int requestCode, Intent data) {
         return ehCodigoRequisicaoInsereNota(requestCode) &&
-                ehCodigoResultadoNotaCriada(resultCode) &&
                 temNota(data);
     }
 
@@ -116,8 +119,8 @@ public class ListaNotasActivity extends AppCompatActivity {
         return resultCode == CODIGO_REQUISICAO_ALTERA_NOTA;
     }
 
-    private boolean ehCodigoResultadoNotaCriada(int resultCode) {
-        return resultCode == CODIGO_RESULTADO_NOTA_CRIADA;
+    private boolean resultadoOK(int resultCode) {
+        return resultCode == Activity.RESULT_OK;
     }
 
     private boolean ehCodigoRequisicaoInsereNota(int requestCode) {
